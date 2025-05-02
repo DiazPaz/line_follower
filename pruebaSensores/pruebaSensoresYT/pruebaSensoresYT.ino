@@ -28,15 +28,14 @@ QTRSensors qtr;
 
 const uint8_t SensorCount = 8;
 uint16_t sensorValues[SensorCount];
-int threshold[SensorCount];
-
+// float Kp = 0.08, Ki = 0.03, Kd = 0.4;
 float Kp = 0.07, Ki = 0.0, Kd = 0.17;
 float Pvalue, Ivalue, Dvalue;
 
 uint16_t position;
 int P, D, I, previousError, PIDvalue, error;
 int lsp, rsp;
-int lfspeed = 150 ;
+int lfspeed = 130 ;
 
 // ------------------------------------------------------------
   
@@ -92,7 +91,7 @@ void loop()
   // Detectar flanco de bajada (botón presionado)
   if (lastState == HIGH && currentState == LOW) {
     onoff = !onoff; 
-//    delay(50); // debounce simple
+    delay(50); // debounce simple
   }
 
   if(onoff)
@@ -119,15 +118,6 @@ void robot_control()
   // from 0 to 7000 (for a white line, use readLineWhite() instead)
   position = qtr.readLineBlack(sensorValues);
   error = 3500 - position;
-  
-//  int promMax = 0, promMin = 0; 
-//  for(int i = 0; i < SensorCount; i++)
-//  {
-//    promMax += qtr.calibration.maximum[i]; 
-//    promMin += qtr.calibration.minimum[i]; 
-//  }
-//  promMax = promMax/SensorCount;
-//  promMin = promMin/SensorCount;
 
   bool allSensorsWhite = true;
   for(int i = 0; i < SensorCount; i++)
@@ -168,7 +158,6 @@ void PID_Linefollow(int error)
     if (I > 1000) I = 1000;
     if (I < -1000) I = -1000;
 
-    // output PID
     Pvalue = Kp*P;
     Ivalue = Ki*I;
     Dvalue = Kd*D; 
